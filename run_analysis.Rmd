@@ -6,8 +6,7 @@ Project of Getting and Cleaning Data
 If you don't have data on your working directory 
 and would like to download for remote server
 uncomment following code 
-
-```r
+```{r}
 # con <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 # download.file(url=con,destfile="data.zip")
 # unzip("data.zip")
@@ -18,8 +17,7 @@ Setting working directory
 ## Reading all the data into workspace
 
 Reading all the data and saved into seperated variable
-
-```r
+```{r}
 setwd("./UCI HAR Dataset/")
 activity_labels <- read.table("activity_labels.txt",header = FALSE,stringsAsFactors = FALSE )
 object_train <- read.table("./train/subject_train.txt",header = FALSE,stringsAsFactors = FALSE)
@@ -32,8 +30,7 @@ test_y <- read.table("./test/y_test.txt",header = FALSE, stringsAsFactors = FALS
 ```
 
 ## manipulating the feature name make them meanfull 
-
-```r
+```{r}
 feature <- feature[,2] 
 feature <- gsub("-",".",feature) # replace "-" into "."
 feature <- gsub("\\(\\)","",feature) # remove "()"
@@ -41,51 +38,44 @@ feature <- gsub("\\(\\)","",feature) # remove "()"
 
 ## rename the test train data set with fearture name
 
-
-```r
+```{r}
 names(test_x) <- feature
 names(train_x)<- feature
 ```
 
 ## combine training x  and testing x dataset
-
-```r
+```{r}
 total_x <- rbind(train_x, test_x)
 object <- c(object_train[,1],object_test[,1])
 ```
 
 ## combine training y and testing y dataset 
-
-```r
+```{r}
 label <- rbind(train_y[1],test_y[1])
 ```
 
 ## adding label and object name into varible name
 
-
-```r
+```{r}
 label_merge <- merge(label,activity_labels,ID = "V1")
 ```
 
 ## combine feature,label, object ID into  final total dataset  
-
-```r
+```{r}
 dat <- data.frame(object = object,
                    activity.labels = label_merge[,2],
                    total_x)
 ```
 
 ## sorting dataset by object 
-
-```r
+```{r}
 dat <- dat[order(dat$object),]
 names(dat) <- c("object","activity.labels",feature)
 ```
 
 ## creating a filtering vector by regulaer expression to find 
 ## varible related mean and stander diviation 
-
-```r
+```{r}
 filter <- grep("std$|mean$",names(dat))
 ## getting mean and std 
 dat_mean_sd <- dat[,c(1,2,filter)]
@@ -94,8 +84,7 @@ rownames(dat_mean_sd) <- NULL
 ```
 
 ## creating and new dataset of average all vailble value by object and activity 
-
-```r
+```{r}
 dat_new <- aggregate(dat[names(dat)[3:ncol(dat)]],
                      by = dat[c("object","activity.labels")],
                      FUN = mean)
@@ -106,7 +95,6 @@ rownames(dat_new) <- NULL
 ```
 
 ## save new dataset into new_data.txt
-
-```r
+```{r}
 write.table(dat_new,"newData.txt",row.names = FALSE)
 ```
